@@ -1,18 +1,46 @@
-const inputs = document.querySelectorAll('.controls input');
+document.addEventListener('DOMContentLoaded', function() {
+  const player = document.querySelector('.player');
+  const video = player.querySelector('.viewer');
+  const progress = player.querySelector('.progress');
+  const progressBar = player.querySelector('.progress__filled');
+  const toggle = player.querySelector('.toggle');
+  const skipButtons = player.querySelectorAll('[data-skip]');
+  const ranges = player.querySelectorAll('.player__slider');
 
-    function handleUpdate() {
-      const suffix = this.dataset.sizing || '';
-      document.documentElement.style.setProperty(`--${this.name}`, this.value + suffix);
-    }
+  function togglePlay() {
+    const method = video.paused ? 'play' : 'pause';
+    video[method]();
+  }
 
-    inputs.forEach(input => input.addEventListener('change', handleUpdate));
-    inputs.forEach(input => input.addEventListener('mousemove', handleUpdate));
-function getplayspeed(){
-	  let playbackRateInput = document.querySelector('.controls .playbackRate'); // replace '.playbackRate' with the correct class or id of your input
-    alert(playbackRateInput.value);
-}
+  function updateButton() {
+    const icon = video.paused ? '►' : '❚ ❚';
+    toggle.textContent = icon;
+  }
 
-function setplayspeed(){
-    let video = document.querySelector('video'); // replace 'video' with the correct selector if necessary
-    video.playbackRate = 0.5;
-}
+  function skip() {
+    video.currentTime += parseFloat(this.dataset.skip);
+  }
+
+  function handleRangeUpdate() {
+    video[this.name] = this.value;
+  }
+
+  function handleProgress() {
+    const percent = (video.currentTime / video.duration) * 100;
+    progressBar.style.flexBasis = `${percent}%`;
+  }
+
+  video.addEventListener('click', togglePlay);
+  video.addEventListener('play', updateButton);
+  video.addEventListener('pause', updateButton);
+
+  toggle.addEventListener('click', togglePlay);
+
+  skipButtons.forEach(button => button.addEventListener('click', skip));
+
+  ranges.forEach(range => range.addEventListener('change', handleRangeUpdate));
+  ranges.forEach(range => range.addEventListener('mousemove', handleRangeUpdate));
+
+  // Initial setup
+  updateButton(); // Update button icon based on initial video state
+});
